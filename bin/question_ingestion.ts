@@ -5,7 +5,7 @@ import { QuestionIngestionStack } from '../lib/question_ingestion-stack';
 import { PipelineStack } from '../lib/pipelinestack';
 
 const app = new cdk.App();
-new QuestionIngestionStack(app, 'QuestionIngestionStack', {
+const questionIngestionStack = new QuestionIngestionStack(app, 'QuestionIngestionStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -23,6 +23,7 @@ new QuestionIngestionStack(app, 'QuestionIngestionStack', {
 
 });
 
-new PipelineStack(app, "PipelineStack", { 
+const pipelineStack = new PipelineStack(app, "PipelineStack", { 
  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
   });
+  pipelineStack.addServiceStage(questionIngestionStack, 'Prod');
