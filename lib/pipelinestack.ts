@@ -40,7 +40,7 @@ pipeline.addStage({
         new CodeBuildAction({
             actionName: "Build",
             project: new PipelineProject(this, "Build", {
-                buildSpec: BuildSpec.fromSourceFilename("buildspec.yml"),
+                buildSpec: BuildSpec.fromSourceFilename("build-specs/cdk-build-spec.yml"),
                 environment: {
                     buildImage: LinuxBuildImage.STANDARD_5_0,
                 },
@@ -51,7 +51,22 @@ pipeline.addStage({
     ],
 });
 
+//add an update stage for the pipeline to be self mutational
+pipeline.addStage({ 
+    stageName: "Pipeline_Update",
+    actions: [
+        new CloudFormationCreateUpdateStackAction({
+            actionName: "Update",
+            templatePath: buildOutput.atPath("PipelineStack.template.json"),
+            stackName: "PipelineStack",
+            adminPermissions: true,
+            parameterOverrides: {
 
+            },
+            extraInputs: [sourceOutput],
+        }),
+    ],
+});
 
     }
   }
