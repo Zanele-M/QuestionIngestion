@@ -63,7 +63,7 @@ export class PipelineStack extends cdk.Stack {
                 new CodeBuildAction({
                     actionName: "ApplicationServer_Build",
                     project: new PipelineProject(this, "ServerBuildProject", {
-                        buildSpec: BuildSpec.fromSourceFilename("build-specs/server-build-spec.yml"),
+                        buildSpec: BuildSpec.fromSourceFilename("build-specs/service-build-spec.yml"),
                         environment: {
                             buildImage: LinuxBuildImage.STANDARD_5_0,
                         },
