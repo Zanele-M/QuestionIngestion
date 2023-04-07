@@ -1,8 +1,8 @@
 {
-  "name": "question_ingest_etl",
+  "name": "question_ingestion",
   "version": "0.1.0",
   "bin": {
-    "question_ingest_etl": "bin/question_ingest_etl.js"
+    "question_ingestion": "bin/question_ingestion.js"
   },
   "scripts": {
     "build": "tsc",
@@ -20,8 +20,7 @@
     "typescript": "~4.9.5"
   },
   "dependencies": {
-    "@aws-cdk/aws-codepipeline": "^1.198.1",
-    "@aws-cdk/aws-codepipeline-actions": "^1.198.1",
+    "@aws-cdk/aws-s3": "^1.198.1",
     "aws-cdk-lib": "2.72.1",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
