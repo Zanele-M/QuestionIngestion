@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { QuestionIngestionStack } from '../lib/question_ingestion-stack';
+import { PipelineStack } from '../lib/pipelinestack';
 
 const app = new cdk.App();
 new QuestionIngestionStack(app, 'QuestionIngestionStack', {
@@ -21,3 +22,7 @@ new QuestionIngestionStack(app, 'QuestionIngestionStack', {
 
 
 });
+
+new PipelineStack(app, "PipelineStack", { 
+ // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
+  });
