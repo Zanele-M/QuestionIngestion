@@ -9,7 +9,7 @@ phases:
     commands:
       - npm run build
       - npm run cdk -- synth
-  artifacts:
-    base-directory: cdk.out
+artifact:
+base-directory: cdk.out
     files:
       - '**/*'
