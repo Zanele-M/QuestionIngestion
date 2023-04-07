@@ -14,8 +14,9 @@ export class PipelineStack extends cdk.Stack {
         crossAccountKeys: false,
       });
   
-      const sourceOutput = new Artifact("SourceOutput");
-  
+      const cdkSourceOutput = new Artifact("SourceOutput");
+      const serviceSourceOutput = new Artifact("ServiceSourceOutput");
+
       pipeline.addStage({
         stageName: "Source",
         actions: [
@@ -25,9 +26,18 @@ export class PipelineStack extends cdk.Stack {
             branch: "main",
             actionName: "Pipeline-Source",
             oauthToken: cdk.SecretValue.secretsManager("github-hook"),
-            output: sourceOutput,
+            output: cdkSourceOutput,
           }),
-        ],
+          //add another github source action for the cdk code
+            new GitHubSourceAction({
+                owner: "Zanele-M",
+                repo: "QuestionIngestionService",
+                branch: "main",
+                oauthToken: cdk.SecretValue.secretsManager("github-hook"),
+                actionName: "CDK-Source",
+                output: serviceSourceOutput,
+       }),
+     ],
       });
 
       // create new artificat called buildOutput
@@ -45,7 +55,7 @@ pipeline.addStage({
                     buildImage: LinuxBuildImage.STANDARD_5_0,
                 },
             }),
-            input: sourceOutput,
+            input: cdkSourceOutput,
             outputs: [buildOutput],
         }),
     ],
@@ -63,7 +73,7 @@ pipeline.addStage({
             parameterOverrides: {
 
             },
-            extraInputs: [sourceOutput],
+            extraInputs: [cdkSourceOutput],
         }),
     ],
 });
