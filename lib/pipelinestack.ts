@@ -4,7 +4,6 @@ import { Construct } from 'constructs';
 import { CloudFormationCreateUpdateStackAction, CodeBuildAction, GitHubSourceAction } from "aws-cdk-lib/aws-codepipeline-actions";
 import { BuildSpec, LinuxBuildImage, PipelineProject } from "aws-cdk-lib/aws-codebuild";
 import { QuestionIngestionStack } from "./question_ingestion-stack";
-
 export class PipelineStack extends cdk.Stack {
     private readonly pipeline: Pipeline;
     private readonly cdkSourceOutput: Artifact;
@@ -47,7 +46,6 @@ export class PipelineStack extends cdk.Stack {
             ],
         });
 
-        // create new artificat called buildOutput
         this.pipelinebBuildOutput = new Artifact("BuildOutput");
         this.serviceBuildOutput = new Artifact("ServiceBuildOutput");
 
@@ -96,7 +94,6 @@ export class PipelineStack extends cdk.Stack {
         });
     }
 
-
     //add a method named addServiceStage to the pipeline stack
     public addServiceStage(serviceStack: QuestionIngestionStack, stageName: string) {
         this.pipeline.addStage({
@@ -104,7 +101,7 @@ export class PipelineStack extends cdk.Stack {
             actions: [
                 new CloudFormationCreateUpdateStackAction({
                     actionName: "Service_Update",
-                    templatePath: this.serviceBuildOutput.atPath( `${serviceStack.stackName}.template.json`),
+                    templatePath: this.serviceBuildOutput.atPath(`${serviceStack.stackName}.template.json`),
                     stackName: serviceStack.stackName,
                     adminPermissions: true,
                     parameterOverrides: {

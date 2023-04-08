@@ -26,4 +26,4 @@ const questionIngestionStack = new QuestionIngestionStack(app, 'QuestionIngestio
 const pipelineStack = new PipelineStack(app, "PipelineStack", { 
  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION }
   });
-  pipelineStack.addServiceStage(questionIngestionStack, 'Prod');
+pipelineStack.addServiceStage(questionIngestionStack, 'Prod');
