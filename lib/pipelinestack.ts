@@ -28,7 +28,7 @@ export class PipelineStack extends cdk.Stack {
                     owner: "Zanele-M",
                     repo: "QuestionIngestion",
                     branch: "main",
-                    actionName: "Pipeline-Source",
+                    actionName: "Infrasctruture",
                     oauthToken: cdk.SecretValue.secretsManager("github-hook"),
                     output: cdkSourceOutput,
                 }),
@@ -38,7 +38,7 @@ export class PipelineStack extends cdk.Stack {
                     repo: "QuestionIngestionService",
                     branch: "main",
                     oauthToken: cdk.SecretValue.secretsManager("github-hook"),
-                    actionName: "ServiceApplication-Source",
+                    actionName: "QuestionIngestionService",
                     output: serviceSourceOutput,
                 }),
             ],
@@ -52,7 +52,7 @@ export class PipelineStack extends cdk.Stack {
             stageName: "Build",
             actions: [
                 new CodeBuildAction({
-                    actionName: "CDK_Build",
+                    actionName: "Infrastructure",
                     project: new PipelineProject(this, "CDKBuild", {
                         buildSpec: BuildSpec.fromSourceFilename("build-specs/cdk-build-spec.yml"),
                         environment: {
@@ -64,8 +64,8 @@ export class PipelineStack extends cdk.Stack {
                 }),
                 //add another build action for the service code
                 new CodeBuildAction({
-                    actionName: "ApplicationServer_Build",
-                    project: new PipelineProject(this, "ServerBuildProject", {
+                    actionName: "QuestionIngestionService",
+                    project: new PipelineProject(this, "QuestionIngestionServiceBuild", {
                         buildSpec: BuildSpec.fromSourceFilename("build-specs/service-build-spec.yml"),
                         environment: {
                             buildImage: LinuxBuildImage.STANDARD_5_0,
