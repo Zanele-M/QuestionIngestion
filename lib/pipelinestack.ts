@@ -64,7 +64,7 @@ export class PipelineStack extends cdk.Stack {
                     input: this.cdkSourceOutput,
                     outputs: [this.pipelinebBuildOutput],
                 }),
-                //add another build action for the cdk service code
+                //add another build action for the service code
                 new CodeBuildAction({
                     actionName: "ApplicationServer_Build",
                     project: new PipelineProject(this, "ServerBuildProject", {
@@ -101,7 +101,7 @@ export class PipelineStack extends cdk.Stack {
             actions: [
                 new CloudFormationCreateUpdateStackAction({
                     actionName: "Service_Update",
-                    templatePath: this.serviceBuildOutput.atPath(`${serviceStack.stackName}.template.json`),
+                    templatePath: this.pipelinebBuildOutput.atPath(`${serviceStack.stackName}.template.json`),
                     stackName: serviceStack.stackName,
                     adminPermissions: true,
                     parameterOverrides: {
