@@ -6,9 +6,7 @@ import { BuildSpec, LinuxBuildImage, PipelineProject } from "aws-cdk-lib/aws-cod
 import { QuestionIngestionStack } from "./question_ingestion-stack";
 export class PipelineStack extends cdk.Stack {
     private readonly pipeline: Pipeline;
-    private readonly cdkSourceOutput: Artifact;
-    private readonly serviceSourceOutput: Artifact;
-    private readonly pipelinebBuildOutput: Artifact;
+    private readonly cdkBuildOutput: Artifact;
     private readonly serviceBuildOutput: Artifact;
 
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,8 +18,8 @@ export class PipelineStack extends cdk.Stack {
             restartExecutionOnUpdate: true,
         });
 
-        this.cdkSourceOutput = new Artifact("SourceOutput");
-        this.serviceSourceOutput = new Artifact("ServiceSourceOutput");
+        const cdkSourceOutput = new Artifact("SourceOutput");
+        const serviceSourceOutput = new Artifact("ServiceSourceOutput");
 
         this.pipeline.addStage({
             stageName: "Source",
@@ -32,7 +30,7 @@ export class PipelineStack extends cdk.Stack {
                     branch: "main",
                     actionName: "Pipeline-Source",
                     oauthToken: cdk.SecretValue.secretsManager("github-hook"),
-                    output: this.cdkSourceOutput,
+                    output: cdkSourceOutput,
                 }),
                 //add another github source action for the cdk code
                 new GitHubSourceAction({
@@ -41,12 +39,12 @@ export class PipelineStack extends cdk.Stack {
                     branch: "main",
                     oauthToken: cdk.SecretValue.secretsManager("github-hook"),
                     actionName: "ServiceApplication-Source",
-                    output: this.serviceSourceOutput,
+                    output: serviceSourceOutput,
                 }),
             ],
         });
 
-        this.pipelinebBuildOutput = new Artifact("BuildOutput");
+        this.cdkBuildOutput = new Artifact("BuildOutput");
         this.serviceBuildOutput = new Artifact("ServiceBuildOutput");
 
         //add a build stage
@@ -54,26 +52,26 @@ export class PipelineStack extends cdk.Stack {
             stageName: "Build",
             actions: [
                 new CodeBuildAction({
-                    actionName: "Pipeline_Build",
-                    project: new PipelineProject(this, "Build", {
+                    actionName: "CDK_Build",
+                    project: new PipelineProject(this, "CDKBuild", {
                         buildSpec: BuildSpec.fromSourceFilename("build-specs/cdk-build-spec.yml"),
                         environment: {
                             buildImage: LinuxBuildImage.STANDARD_5_0,
                         },
                     }),
-                    input: this.cdkSourceOutput,
-                    outputs: [this.pipelinebBuildOutput],
+                    input: cdkSourceOutput,
+                    outputs: [this.cdkBuildOutput],
                 }),
                 //add another build action for the service code
                 new CodeBuildAction({
                     actionName: "ApplicationServer_Build",
                     project: new PipelineProject(this, "ServerBuildProject", {
-                        buildSpec: BuildSpec.fromSourceFilename("build-specs/service-build-spec.yml"),
+                        buildSpec: BuildSpec.fromSourceFilename("build-specs/cdk-build-spec.yml"),
                         environment: {
                             buildImage: LinuxBuildImage.STANDARD_5_0,
                         },
                     }),
-                    input: this.serviceSourceOutput,
+                    input: serviceSourceOutput,
                     outputs: [this.serviceBuildOutput],
                 }),
             ],
@@ -85,10 +83,9 @@ export class PipelineStack extends cdk.Stack {
             actions: [
                 new CloudFormationCreateUpdateStackAction({
                     actionName: "Update",
-                    templatePath: this.pipelinebBuildOutput.atPath("PipelineStack.template.json"),
+                    templatePath: this.cdkBuildOutput.atPath("PipelineStack.template.json"),
                     stackName: "PipelineStack",
                     adminPermissions: true,
-                    extraInputs: [this.cdkSourceOutput],
                 }),
             ],
         });
@@ -101,7 +98,7 @@ export class PipelineStack extends cdk.Stack {
             actions: [
                 new CloudFormationCreateUpdateStackAction({
                     actionName: "Service_Update",
-                    templatePath: this.pipelinebBuildOutput.atPath(`${serviceStack.stackName}.template.json`),
+                    templatePath: this.cdkBuildOutput.atPath(`${serviceStack.stackName}.template.json`),
                     stackName: serviceStack.stackName,
                     adminPermissions: true,
                     parameterOverrides: {
