@@ -28,7 +28,7 @@ export class PipelineStack extends cdk.Stack {
                     owner: "Zanele-M",
                     repo: "QuestionIngestion",
                     branch: "main",
-                    actionName: "Infrasctruture",
+                    actionName: "infrastructure",
                     oauthToken: cdk.SecretValue.secretsManager("github-hook"),
                     output: cdkSourceOutput,
                 }),
@@ -77,7 +77,7 @@ export class PipelineStack extends cdk.Stack {
             ],
         });
 
-        //add an update stage for the pipeline to be self mutational
+        //add an update stage for the pipeline to be self mutating
         this.pipeline.addStage({
             stageName: "Pipeline_Update",
             actions: [

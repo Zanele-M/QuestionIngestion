@@ -12,7 +12,7 @@ export class QuestionIngestionStack extends cdk.Stack {
 
     //add a aws lambda resource for, runtime should be node 14.x, handler should be index.handler
     const lambda = new Function(this, "ServiceLambda", {
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_18_X,
         handler: "src/lambda.handler",
         code: this.serviceCode,
         functionName: "QuestionIngestion",
