@@ -66,7 +66,7 @@ export class PipelineStack extends cdk.Stack {
                 new CodeBuildAction({
                     actionName: "QuestionIngestionService",
                     project: new PipelineProject(this, "QuestionIngestionServiceBuild", {
-                        buildSpec: BuildSpec.fromSourceFilename("build-specs/service-build-spec.yml"),
+                        buildSpec: BuildSpec.fromSourceFilename("buildspec.yml"),
                         environment: {
                             buildImage: LinuxBuildImage.STANDARD_5_0,
                         },
