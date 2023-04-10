@@ -89,6 +89,24 @@ export class PipelineStack extends cdk.Stack {
                 }),
             ],
         });
+
+        this.pipeline.addStage({    
+            stageName: "QuestionIngestionServiceBuild",
+            actions: [
+                new CodeBuildAction({
+                    actionName: "QuestionIngestionService",
+                    project: new PipelineProject(this, "QuestionIngestionServiceBuild", {
+                        buildSpec: BuildSpec.fromSourceFilename("buildspec.yml"),
+                        environment: {
+                            buildImage: LinuxBuildImage.STANDARD_5_0,
+                        },
+                    }),
+                    input: serviceSourceOutput,
+                    outputs: [this.serviceBuildOutput],
+                }),
+            ],
+        });
+
     }
 
     //add a method named addServiceStage to the pipeline stack
